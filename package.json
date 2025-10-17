@@ -1,0 +1,130 @@
+{
+  "name": "genet-json-formatter",
+  "displayName": "Genet: JSON Formatter",
+  "description": "Smart JSON formatter that keeps small objects compact while beautifully formatting larger structures with configurable indentation",
+  "version": "1.0.0",
+  "publisher": "ecleroux",
+  "author": {
+    "name": "Edwin le Roux"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/ecleroux/genet-json-formatter#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecleroux/genet-json-formatter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ecleroux/genet-json-formatter/issues"
+  },
+    "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other"
+  ],
+  "keywords": [
+    "json",
+    "formatter",
+    "compact",
+    "beautify",
+    "indent",
+    "minify",
+    "validate",
+    "pretty",
+    "format",
+    "typescript",
+    "smart",
+    "intelligent"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "json",
+        "aliases": ["JSON", "json"],
+        "extensions": [".json"],
+        "mimetypes": ["application/json"]
+      }
+    ],
+    "commands": [
+      {
+        "command": "genet-json-formatter.formatJson",
+        "title": "Genet: JSON Format"
+      },
+      {
+        "command": "genet-json-formatter.minifyJson",
+        "title": "Genet: JSON Minify"
+      },
+      {
+        "command": "genet-json-formatter.validateJson",
+        "title": "Genet: JSON Validate"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "genet-json-formatter.formatJson",
+        "key": "ctrl+alt+f",
+        "mac": "ctrl+cmd+alt+f",
+        "when": "editorTextFocus && resourceExtname == .json"
+      },
+      {
+        "command": "genet-json-formatter.minifyJson",
+        "key": "ctrl+alt+m",
+        "mac": "ctrl+cmd+alt+m",
+        "when": "editorTextFocus && resourceExtname == .json"
+      },
+      {
+        "command": "genet-json-formatter.validateJson",
+        "key": "ctrl+alt+v",
+        "mac": "ctrl+cmd+alt+v",
+        "when": "editorTextFocus && resourceExtname == .json"
+      }
+    ],
+    "configuration": {
+      "title": "Genet: JSON Formatter",
+      "properties": {
+        "genet-json-formatter.maxSingleLineLength": {
+          "type": "number",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 500,
+          "description": "Maximum character length for objects and arrays to stay on a single line"
+        },
+        "genet-json-formatter.indentSpaces": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 8,
+          "description": "Number of spaces to use for indentation"
+        },
+        "genet-json-formatter.formatOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically format JSON files when saving"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.105.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
