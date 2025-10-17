@@ -207,22 +207,6 @@ To enable automatic formatting when saving JSON files:
 
 **Note**: Format on save only applies to `.json` files and will safely skip files with invalid JSON syntax.
 
-### Keyboard Shortcut Customization
-
-You can customize the keyboard shortcuts if needed:
-
-**Customize Shortcuts in Keyboard Shortcuts Editor:**
-1. **Open** `Preferences` → `Keyboard Shortcuts` (`Cmd+K Cmd+S`)
-2. **Search** for "genet" or "JSON Format"
-3. **Click** the pencil icon next to any command
-4. **Press** your preferred key combination
-5. **Press** Enter to save
-
-**Available Commands to Customize:**
-- `genet-json-formatter.formatJson` - Smart JSON formatting
-- `genet-json-formatter.minifyJson` - JSON minification
-- `genet-json-formatter.validateJson` - JSON validation
-
 ### Set as Default Formatter
 To make Genet your default JSON formatter:
 1. **Open a JSON file**
@@ -259,14 +243,6 @@ To make Genet your default JSON formatter:
 - **Integration** with existing VS Code formatting workflows
 - **Team consistency** with standardized formatting on every save
 - **Error-safe operations** that never break your save process
-
-## 🐾 About Genet
-
-The Genet is a small, agile carnivore known for its:
-- **Precise movements** → Accurate formatting
-- **Nocturnal efficiency** → Works behind the scenes
-- **Adaptability** → Smart formatting decisions
-- **Spotted patterns** → Organizes code beautifully
 
 ## 🎮 Available Commands
 
