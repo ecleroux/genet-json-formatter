@@ -5,6 +5,24 @@ All notable changes to the Genet JSON Formatter extension will be documented in 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-10-22
+
+### Added
+- **JSON List Compact Formatting**: New `Genet: JSON Format List Compact` command that formats arrays with each item on a new line as compact single-line objects for optimal scan-ability
+- **List Format Keyboard Shortcut**: `Ctrl+Alt+L` (Windows/Linux) or `Ctrl+Cmd+Option+L` (macOS)
+- **Dedicated List Formatter**: New `customJsonListFormat()` function optimized for data lists, API responses, and configuration arrays
+- **Future-Proof Command ID**: Uses `genet-json-formatter.formatJsonListCompact` for consistency and future extensibility
+
+### Enhanced
+- **Command Palette**: Added "Genet: JSON Format List Compact" to available commands
+- **Documentation**: Updated README.md with list formatting examples and usage instructions
+- **Keyboard Shortcuts**: Extended shortcuts table to include the new list formatting option
+
+### Technical
+- **Type Safety**: Maintained full TypeScript implementation with proper error handling
+- **Performance**: List formatting includes progress indicators for large files (>50KB)
+- **Integration**: Seamless integration with existing VS Code formatting workflows
+
 ## [1.0.0] - 2025-10-17
 
 ### Added

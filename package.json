@@ -61,6 +61,10 @@
       {
         "command": "genet-json-formatter.validateJson",
         "title": "Genet: JSON Validate"
+      },
+      {
+        "command": "genet-json-formatter.formatJsonListCompact",
+        "title": "Genet: JSON Format List Compact"
       }
     ],
     "keybindings": [
@@ -80,6 +84,12 @@
         "command": "genet-json-formatter.validateJson",
         "key": "ctrl+alt+v",
         "mac": "ctrl+cmd+alt+v",
+        "when": "editorTextFocus && resourceExtname == .json"
+      },
+      {
+        "command": "genet-json-formatter.formatJsonListCompact",
+        "key": "ctrl+alt+l",
+        "mac": "ctrl+cmd+alt+l",
         "when": "editorTextFocus && resourceExtname == .json"
       }
     ],

@@ -13,8 +13,13 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
 
 ### 🔧 **Intelligent Array Handling**
 - **Arrays with objects** → Each item on separate lines
-- **Simple arrays** → Compact on single line (when small)
+- **Simple arrays** → Compact on single line (when small)  
 - **Mixed arrays** → Smart formatting based on content
+
+### 📋 **List Formatting Mode**
+- **Force each array item on new line** → Perfect for data lists
+- **Keep items compact on single line** → Clean tabular appearance
+- **Ideal for logs and data arrays** → Maximum scan-ability
 
 ### ⚙️ **Fully Configurable**
 - **Adjustable line length limit** (10-500 characters)
@@ -63,6 +68,7 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
 
 ### Method 4: Keyboard Shortcuts (Fastest)
 - **Format JSON**: `Ctrl+Alt+F` (Windows/Linux) or `Ctrl+Cmd+Option+F` (macOS)
+- **Format List**: `Ctrl+Alt+L` (Windows/Linux) or `Ctrl+Cmd+Option+L` (macOS)
 - **Minify JSON**: `Ctrl+Alt+M` (Windows/Linux) or `Ctrl+Cmd+Option+M` (macOS)
 - **Validate JSON**: `Ctrl+Alt+V` (Windows/Linux) or `Ctrl+Cmd+Option+V` (macOS)
 - **Works only in JSON files** for context-aware operation
@@ -100,6 +106,28 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
   ]
 }
 ```
+
+### JSON List Compact Formatting (Genet: JSON Format List Compact)
+
+**Perfect for arrays where each item should be on its own line, regardless of size**
+
+**Before:**
+```json
+[{"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "profile": {"age": 28, "location": "San Francisco"}}, {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "profile": {"age": 35, "location": "New York"}}]
+```
+
+**After (List Format):**
+```json
+[
+  { "id": 1, "name": "Alice Johnson", "email": "alice@example.com", "profile": { "age": 28, "location": "San Francisco" } },
+  { "id": 2, "name": "Bob Smith", "email": "bob@example.com", "profile": { "age": 35, "location": "New York" } }
+]
+```
+
+**Key differences from regular format:**
+- **Each array item gets its own line** but stays compact on that line
+- **Objects remain single-line** with proper spacing for readability
+- **Perfect for data lists, logs, and tabular JSON data**
 
 ### JSON Minification (Genet: JSON Minify)
 
@@ -249,6 +277,7 @@ To make Genet your default JSON formatter:
 | Command | Description | Keyboard Shortcut | Usage |
 |---------|-------------|-------------------|--------|
 | `Genet: JSON Format` | Smart formatting with intelligent compact/expanded layout | `Ctrl+Alt+F` / `Ctrl+Cmd+Option+F` | Command Palette, Format Document, or shortcut |
+| `Genet: JSON Format List Compact` | Format arrays with each item on new line as compact single-line objects | `Ctrl+Alt+L` / `Ctrl+Cmd+Option+L` | Command Palette or shortcut |
 | `Genet: JSON Minify` | Ultra-compact single-line JSON output | `Ctrl+Alt+M` / `Ctrl+Cmd+Option+M` | Command Palette or shortcut |
 | `Genet: JSON Validate` | Validate JSON syntax with detailed error reporting | `Ctrl+Alt+V` / `Ctrl+Cmd+Option+V` | Command Palette or shortcut |
 | **Format Document** | VS Code's built-in formatter (uses Genet when set as default) | `Shift+Alt+F` / `Shift+Option+F` | Built-in VS Code shortcut, right-click menu |
@@ -256,7 +285,7 @@ To make Genet your default JSON formatter:
 
 ### VS Code Integration Notes
 - **Format Document** and **Format Selection** appear in VS Code's right-click context menu when available
-- **Custom commands** (`Genet: JSON Format`, `Minify`, `Validate`) are accessed via Command Palette or keyboard shortcuts
+- **Custom commands** (`Genet: JSON Format`, `Format List Compact`, `Minify`, `Validate`) are accessed via Command Palette or keyboard shortcuts
 - **No custom context menu items** - integration works through VS Code's built-in formatting system
 
 ## 🔌 VS Code Integration
@@ -281,6 +310,7 @@ To make Genet your default JSON formatter:
 | Action | Windows/Linux | macOS |
 |--------|---------------|-------|
 | **Format JSON** | `Ctrl+Alt+F` | `Ctrl+Cmd+Option+F` |
+| **Format List** | `Ctrl+Alt+L` | `Ctrl+Cmd+Option+L` |
 | **Minify JSON** | `Ctrl+Alt+M` | `Ctrl+Cmd+Option+M` |
 | **Validate JSON** | `Ctrl+Alt+V` | `Ctrl+Cmd+Option+V` |
 
@@ -301,7 +331,7 @@ To make Genet your default JSON formatter:
 
 ## 📝 Release Notes
 
-### 0.0.1
+### 1.0.0
 - Initial release with comprehensive JSON toolkit
 - **Smart compact formatting** with intelligent layout decisions
 - **JSON minification** for ultra-compact output
@@ -328,29 +358,6 @@ This extension includes a robust testing suite ensuring reliability and performa
 - **🔧 Integration Tests**: Complete VS Code API integration validation ✅
 - **🐛 Edge Case Tests**: Invalid JSON, malformed data, and error scenarios ✅
 - **📊 Benchmarking**: Performance monitoring and regression detection ✅
-
-### **Running Tests**
-```bash
-# Add Node.js to PATH (for zsh users)
-export PATH="/usr/local/bin:$PATH"
-
-# Run all tests (78 tests passing)
-npm test
-
-# Quick test suite (no performance tests)
-./test-runner.sh quick
-
-# Run specific test categories
-./test-runner.sh unit         # Core logic tests
-./test-runner.sh integration  # VS Code integration tests  
-./test-runner.sh performance  # Performance benchmarks
-
-# Development mode
-./test-runner.sh watch        # Watch mode for development
-
-# Use npm wrapper (sets PATH automatically)
-./npm-wrapper.sh test
-```
 
 ### **Test Categories**
 - **Core Algorithm Tests**: Smart formatting logic validation

@@ -30,7 +30,8 @@ const LARGE_FILE_THRESHOLD = 50000; // Show progress for files larger than 50KB
 const COMMANDS = {
 	FORMAT: 'genet-json-formatter.formatJson',
 	MINIFY: 'genet-json-formatter.minifyJson',
-	VALIDATE: 'genet-json-formatter.validateJson'
+	VALIDATE: 'genet-json-formatter.validateJson',
+	FORMAT_LIST_COMPACT: 'genet-json-formatter.formatJsonListCompact'
 } as const;
 
 const MESSAGES = {
@@ -39,6 +40,8 @@ const MESSAGES = {
 		FORMAT_DOCUMENT: 'JSON document formatted successfully!',
 		MINIFY_SELECTION: 'JSON selection minified successfully!',
 		MINIFY_DOCUMENT: 'JSON document minified successfully!',
+		FORMAT_LIST_SELECTION: 'JSON list selection formatted successfully!',
+		FORMAT_LIST_DOCUMENT: 'JSON list document formatted successfully!',
 		VALIDATE_SUCCESS: 'JSON is valid! ✅',
 		VALIDATE_SUCCESS_DETAILS: (lines: number, chars: number) => `JSON is valid! ✅ (${lines} lines, ${chars} characters)`
 	},
@@ -90,7 +93,6 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		await vscode.workspace.applyEdit(edit);
 		
-		const target = isSelection ? 'selection' : 'document';
 		const message = operation === 'formatted' 
 			? (isSelection ? MESSAGES.SUCCESS.FORMAT_SELECTION : MESSAGES.SUCCESS.FORMAT_DOCUMENT)
 			: (isSelection ? MESSAGES.SUCCESS.MINIFY_SELECTION : MESSAGES.SUCCESS.MINIFY_DOCUMENT);
@@ -194,6 +196,57 @@ export function activate(context: vscode.ExtensionContext) {
 		return JSON.stringify(obj);
 	}
 
+	// Custom JSON list formatter that keeps each array item on a single line
+	// Perfect for data lists where each item should be compact but readable
+	function customJsonListFormat(
+		obj: JsonValue, 
+		indent: number = 0, 
+		indentSpaces: number = DEFAULT_INDENT_SPACES
+	): string {
+		const indentStr = ' '.repeat(indent * indentSpaces);
+		
+		if (obj === null) {
+			return 'null';
+		}
+		if (typeof obj === 'boolean' || typeof obj === 'number') {
+			return obj.toString();
+		}
+		if (typeof obj === 'string') {
+			return JSON.stringify(obj);
+		}
+		
+		if (Array.isArray(obj)) {
+			// Always format arrays with each item on a new line
+			if (obj.length === 0) {
+				return '[]';
+			}
+			
+			const items = obj.map(item => {
+				// For array items, always use compact single-line format
+				const compactItem = JSON.stringify(item)
+					.replace(/^\{/, '{ ')
+					.replace(/\}$/, ' }')
+					.replace(/:/g, ': ')
+					.replace(/,/g, ', ');
+				return indentStr + ' '.repeat(indentSpaces) + compactItem;
+			});
+			
+			return '[\n' + items.join(',\n') + '\n' + indentStr + ']';
+		}
+		
+		if (typeof obj === 'object') {
+			// For standalone objects (not array items), use compact single-line format
+			const compactObject = JSON.stringify(obj);
+			return compactObject
+				.replace(/^\{/, '{ ')
+				.replace(/\}$/, ' }')
+				.replace(/:/g, ': ')
+				.replace(/,/g, ', ');
+		}
+		
+		return JSON.stringify(obj);
+	}
+
 	// Register the JSON format command
 	const formatJsonDisposable = vscode.commands.registerCommand(COMMANDS.FORMAT, async () => {
 		const editor = vscode.window.activeTextEditor;
@@ -256,6 +309,46 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(minifyJsonDisposable);
+
+	// Register the JSON list format command
+	const formatJsonListDisposable = vscode.commands.registerCommand(COMMANDS.FORMAT_LIST_COMPACT, async () => {
+		const editor = vscode.window.activeTextEditor;
+		
+		if (!editor) {
+			vscode.window.showErrorMessage(MESSAGES.ERROR.NO_EDITOR);
+			return;
+		}
+
+		try {
+			const { text, range, isSelection } = prepareFormatting(editor);
+			const config = getFormatConfig();
+
+			// Execute list formatting with progress indicator for large files
+			const formattedJson = await executeWithProgress(
+				() => {
+					const parsedJson: JsonValue = JSON.parse(text);
+					return customJsonListFormat(parsedJson, 0, config.indentSpaces);
+				},
+				'Formatting JSON list...',
+				text
+			);
+
+			// Apply formatting with custom success message
+			const edit = new vscode.WorkspaceEdit();
+			edit.replace(editor.document.uri, range, formattedJson);
+			await vscode.workspace.applyEdit(edit);
+			
+			const message = isSelection 
+				? MESSAGES.SUCCESS.FORMAT_LIST_SELECTION 
+				: MESSAGES.SUCCESS.FORMAT_LIST_DOCUMENT;
+			vscode.window.showInformationMessage(message);
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			vscode.window.showErrorMessage(MESSAGES.ERROR.INVALID_JSON(errorMessage));
+		}
+	});
+
+	context.subscriptions.push(formatJsonListDisposable);
 
 	// Register the JSON validation command
 	const validateJsonDisposable = vscode.commands.registerCommand(COMMANDS.VALIDATE, async () => {

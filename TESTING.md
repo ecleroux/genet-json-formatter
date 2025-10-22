@@ -6,6 +6,29 @@ This document describes the comprehensive testing suite for the Genet JSON Forma
 
 The testing suite is organized into four main test files, each covering different aspects of the extension:
 
+### **Running Tests**
+```bash
+# Add Node.js to PATH (for zsh users)
+export PATH="/usr/local/bin:$PATH"
+
+# Run all tests (78 tests passing)
+npm test
+
+# Quick test suite (no performance tests)
+./test-runner.sh quick
+
+# Run specific test categories
+./test-runner.sh unit         # Core logic tests
+./test-runner.sh integration  # VS Code integration tests  
+./test-runner.sh performance  # Performance benchmarks
+
+# Development mode
+./test-runner.sh watch        # Watch mode for development
+
+# Use npm wrapper (sets PATH automatically)
+./npm-wrapper.sh test
+```
+
 ### 1. `extension.test.ts` - Main Extension Tests
 **Comprehensive VS Code integration testing**
 
