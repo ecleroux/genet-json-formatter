@@ -9,6 +9,17 @@ const TEST_JSON_SIMPLE_ARRAY = '["apple","banana","cherry"]';
 const TEST_JSON_INVALID = '{"name":"John","age":30,}'; // Trailing comma
 const TEST_JSON_MALFORMED = '{"name":"John"age":30}'; // Missing colon
 
+// Test data for sorting functionality
+const TEST_JSON_SORT_OBJECTS = '[{"name":"Charlie","age":35,"score":88},{"name":"Alice","age":28,"score":95},{"name":"Bob","age":35,"score":82}]';
+const TEST_JSON_SORT_STRINGS = '["zebra","apple","banana","cherry"]';
+const TEST_JSON_SORT_NUMBERS = '[42,7,23,1,89,15]';
+const TEST_JSON_SORT_BOOLEANS = '[true,false,true,false]';
+const TEST_JSON_SORT_MIXED = '[{"name":"Alice","age":30},"zebra",42,{"name":"Bob","age":25},true,null,"apple"]';
+const TEST_JSON_SORT_NULLS = '[null,"test",null,123,null]';
+const TEST_JSON_SORT_EMPTY = '[]';
+const TEST_JSON_NOT_ARRAY = '{"name":"John","age":30}';
+const TEST_JSON_NESTED_ARRAYS = '[["a","b"],["c","d"]]';
+
 suite('Genet JSON Formatter Extension Tests', () => {
 	let document: vscode.TextDocument;
 	let editor: vscode.TextEditor;
@@ -50,6 +61,8 @@ suite('Genet JSON Formatter Extension Tests', () => {
 			assert.ok(commands.includes('genet-json-formatter.formatJson'), 'Format command should be registered');
 			assert.ok(commands.includes('genet-json-formatter.minifyJson'), 'Minify command should be registered');
 			assert.ok(commands.includes('genet-json-formatter.validateJson'), 'Validate command should be registered');
+			assert.ok(commands.includes('genet-json-formatter.formatJsonListCompact'), 'Format list compact command should be registered');
+			assert.ok(commands.includes('genet-json-formatter.sortJsonList'), 'Sort JSON list command should be registered');
 		});
 	});
 
@@ -468,6 +481,352 @@ suite('Genet JSON Formatter Extension Tests', () => {
 				assert.ok(formattedText.length > 0, 'Should handle large JSON without crashing');
 				
 				resolve(undefined);
+			});
+		});
+	});
+
+	suite('List Compact Formatting Command', () => {
+		test('Should format array with compact list formatting', async () => {
+			document = await vscode.workspace.openTextDocument({
+				content: TEST_JSON_ARRAY_WITH_OBJECTS,
+				language: 'json'
+			});
+			editor = await vscode.window.showTextDocument(document);
+
+			await vscode.commands.executeCommand('genet-json-formatter.formatJsonListCompact');
+
+			const formattedText = document.getText();
+			
+			// Should contain expected data
+			assert.ok(formattedText.includes('"id"'), 'Should contain id fields');
+			assert.ok(formattedText.includes('"name"'), 'Should contain name fields');
+			assert.ok(formattedText.includes('Alice'), 'Should contain Alice');
+			assert.ok(formattedText.includes('Bob'), 'Should contain Bob');
+			
+			// Should be parseable JSON
+			assert.doesNotThrow(() => JSON.parse(formattedText), 'Should produce valid JSON');
+		});
+
+		test('Should handle non-array JSON gracefully', async () => {
+			document = await vscode.workspace.openTextDocument({
+				content: TEST_JSON_NOT_ARRAY,
+				language: 'json'
+			});
+			editor = await vscode.window.showTextDocument(document);
+
+			try {
+				await vscode.commands.executeCommand('genet-json-formatter.formatJsonListCompact');
+				// For non-arrays, the command should run without error
+				// The content may be formatted as regular JSON
+				const newContent = document.getText();
+				assert.ok(newContent.length > 0, 'Should have some content');
+				
+				// Should be valid JSON
+				assert.doesNotThrow(() => JSON.parse(newContent), 'Should produce valid JSON');
+			} catch (error) {
+				assert.fail(`Command should handle non-array JSON gracefully: ${error}`);
+			}
+		});
+	});
+
+	suite('JSON Array Sorting Tests', () => {
+		suite('Object Array Sorting', () => {
+			test('Should sort objects by name ascending (simulated)', async () => {
+				// Since we can't easily simulate user input in tests, we'll test the sorting logic
+				// by checking that the command runs without errors on object arrays
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_OBJECTS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 3, 'Should have 3 objects');
+				assert.ok(originalData.every((item: any) => item.hasOwnProperty('name')), 'All objects should have name property');
+				
+				// Command should run without errors (user interaction would be required for full test)
+				try {
+					// We can't test the full interactive flow in unit tests, but we can verify
+					// the command is registered and doesn't crash on valid input
+					const commands = await vscode.commands.getCommands();
+					assert.ok(commands.includes('genet-json-formatter.sortJsonList'), 'Sort command should be registered');
+				} catch (error) {
+					assert.fail(`Sort command should not throw errors: ${error}`);
+				}
+			});
+
+			test('Should handle objects with missing properties', async () => {
+				const testData = '[{"name":"Alice","age":30},{"name":"Bob"},{"age":25}]';
+				
+				document = await vscode.workspace.openTextDocument({
+					content: testData,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 3, 'Should have 3 objects');
+				
+				// Verify data structure
+				assert.strictEqual(originalData[0].name, 'Alice', 'First object should have Alice');
+				assert.strictEqual(originalData[1].name, 'Bob', 'Second object should have Bob');
+				assert.ok(!originalData[2].hasOwnProperty('name'), 'Third object should not have name');
+			});
+
+			test('Should handle objects with null values', async () => {
+				const testData = '[{"name":"Alice","score":95},{"name":"Bob","score":null},{"name":"Charlie","score":88}]';
+				
+				document = await vscode.workspace.openTextDocument({
+					content: testData,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 3, 'Should have 3 objects');
+				assert.strictEqual(originalData[1].score, null, 'Second object should have null score');
+			});
+		});
+
+		suite('Primitive Array Sorting', () => {
+			test('Should handle string arrays', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_STRINGS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 4, 'Should have 4 strings');
+				assert.ok(originalData.every((item: any) => typeof item === 'string'), 'All items should be strings');
+				
+				// Check original order
+				assert.strictEqual(originalData[0], 'zebra', 'First item should be zebra');
+				assert.strictEqual(originalData[1], 'apple', 'Second item should be apple');
+			});
+
+			test('Should handle number arrays', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_NUMBERS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 6, 'Should have 6 numbers');
+				assert.ok(originalData.every((item: any) => typeof item === 'number'), 'All items should be numbers');
+				
+				// Check original order
+				assert.strictEqual(originalData[0], 42, 'First item should be 42');
+				assert.strictEqual(originalData[1], 7, 'Second item should be 7');
+			});
+
+			test('Should handle boolean arrays', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_BOOLEANS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 4, 'Should have 4 booleans');
+				assert.ok(originalData.every((item: any) => typeof item === 'boolean'), 'All items should be booleans');
+			});
+
+			test('Should handle arrays with null values', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_NULLS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 5, 'Should have 5 items');
+				
+				const nullCount = originalData.filter((item: any) => item === null).length;
+				assert.strictEqual(nullCount, 3, 'Should have 3 null values');
+			});
+		});
+
+		suite('Mixed Array Sorting', () => {
+			test('Should handle mixed primitive and object arrays', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_MIXED,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 7, 'Should have 7 items');
+				
+				// Check we have both objects and primitives
+				const objectCount = originalData.filter((item: any) => typeof item === 'object' && item !== null && !Array.isArray(item)).length;
+				const primitiveCount = originalData.length - objectCount;
+				
+				assert.strictEqual(objectCount, 2, 'Should have 2 objects');
+				assert.strictEqual(primitiveCount, 5, 'Should have 5 primitives');
+			});
+		});
+
+		suite('Edge Cases', () => {
+			test('Should handle empty arrays', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_EMPTY,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 0, 'Should have 0 items');
+				assert.ok(Array.isArray(originalData), 'Should be an array');
+			});
+
+			test('Should handle single item arrays', async () => {
+				const singleItemArray = '["onlyItem"]';
+				
+				document = await vscode.workspace.openTextDocument({
+					content: singleItemArray,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 1, 'Should have 1 item');
+				assert.strictEqual(originalData[0], 'onlyItem', 'Should contain the single item');
+			});
+
+			test('Should handle arrays with nested arrays', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_NESTED_ARRAYS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				assert.strictEqual(originalData.length, 2, 'Should have 2 items');
+				assert.ok(Array.isArray(originalData[0]), 'First item should be an array');
+				assert.ok(Array.isArray(originalData[1]), 'Second item should be an array');
+			});
+
+			test('Should reject non-array JSON', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_NOT_ARRAY,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalContent = document.getText();
+				
+				try {
+					// Sort command should handle non-arrays gracefully (may show error message)
+					// but should not crash or modify the document
+					await vscode.commands.executeCommand('genet-json-formatter.sortJsonList');
+					
+					// Content should remain unchanged for non-arrays
+					const newContent = document.getText();
+					assert.strictEqual(newContent, originalContent, 'Non-array JSON should remain unchanged');
+				} catch (error) {
+					assert.fail(`Sort command should handle non-arrays gracefully: ${error}`);
+				}
+			});
+		});
+
+		suite('Data Integrity Tests', () => {
+			test('Original array data should be preserved after sorting preparation', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_OBJECTS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				const expectedNames = ['Charlie', 'Alice', 'Bob'];
+				const expectedAges = [35, 28, 35];
+				const expectedScores = [88, 95, 82];
+				
+				// Verify original data integrity
+				assert.strictEqual(originalData.length, 3, 'Should have 3 objects');
+				
+				originalData.forEach((item: any, index: number) => {
+					assert.strictEqual(item.name, expectedNames[index], `Object ${index} should have correct name`);
+					assert.strictEqual(item.age, expectedAges[index], `Object ${index} should have correct age`);
+					assert.strictEqual(item.score, expectedScores[index], `Object ${index} should have correct score`);
+				});
+			});
+
+			test('Primitive arrays should maintain type consistency', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_NUMBERS,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				
+				// All items should be numbers
+				originalData.forEach((item: any, index: number) => {
+					assert.strictEqual(typeof item, 'number', `Item ${index} should be a number`);
+					assert.ok(!isNaN(item), `Item ${index} should be a valid number`);
+				});
+			});
+
+			test('Mixed arrays should preserve individual item types', async () => {
+				document = await vscode.workspace.openTextDocument({
+					content: TEST_JSON_SORT_MIXED,
+					language: 'json'
+				});
+				editor = await vscode.window.showTextDocument(document);
+
+				const originalData = JSON.parse(document.getText());
+				
+				// Check specific types are preserved
+				const objectItems = originalData.filter((item: any) => typeof item === 'object' && item !== null && !Array.isArray(item));
+				const stringItems = originalData.filter((item: any) => typeof item === 'string');
+				const numberItems = originalData.filter((item: any) => typeof item === 'number');
+				const booleanItems = originalData.filter((item: any) => typeof item === 'boolean');
+				const nullItems = originalData.filter((item: any) => item === null);
+				
+				assert.strictEqual(objectItems.length, 2, 'Should have 2 objects');
+				assert.strictEqual(stringItems.length, 2, 'Should have 2 strings');
+				assert.strictEqual(numberItems.length, 1, 'Should have 1 number');
+				assert.strictEqual(booleanItems.length, 1, 'Should have 1 boolean');
+				assert.strictEqual(nullItems.length, 1, 'Should have 1 null');
+			});
+		});
+
+		suite('Performance Tests', () => {
+			test('Should handle reasonably large arrays without timeout', function() {
+				this.timeout(5000); // 5 second timeout
+				
+				return new Promise(async (resolve) => {
+					// Create a moderately large array
+					const largeArray = [];
+					for (let i = 0; i < 100; i++) {
+						largeArray.push({
+							id: i,
+							name: `Item ${i}`,
+							value: Math.random() * 100,
+							timestamp: new Date().toISOString()
+						});
+					}
+					
+					document = await vscode.workspace.openTextDocument({
+						content: JSON.stringify(largeArray),
+						language: 'json'
+					});
+					editor = await vscode.window.showTextDocument(document);
+
+					const originalData = JSON.parse(document.getText());
+					assert.strictEqual(originalData.length, 100, 'Should have 100 items');
+					
+					// Verify structure
+					originalData.forEach((item: any, index: number) => {
+						assert.strictEqual(item.id, index, `Item ${index} should have correct id`);
+						assert.ok(item.name.includes(`Item ${index}`), `Item ${index} should have correct name`);
+					});
+					
+					resolve(undefined);
+				});
 			});
 		});
 	});

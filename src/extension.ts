@@ -31,7 +31,8 @@ const COMMANDS = {
 	FORMAT: 'genet-json-formatter.formatJson',
 	MINIFY: 'genet-json-formatter.minifyJson',
 	VALIDATE: 'genet-json-formatter.validateJson',
-	FORMAT_LIST_COMPACT: 'genet-json-formatter.formatJsonListCompact'
+	FORMAT_LIST_COMPACT: 'genet-json-formatter.formatJsonListCompact',
+	SORT_LIST: 'genet-json-formatter.sortJsonList'
 } as const;
 
 const MESSAGES = {
@@ -42,13 +43,18 @@ const MESSAGES = {
 		MINIFY_DOCUMENT: 'JSON document minified successfully!',
 		FORMAT_LIST_SELECTION: 'JSON list selection formatted successfully!',
 		FORMAT_LIST_DOCUMENT: 'JSON list document formatted successfully!',
+		SORT_LIST_SELECTION: (property: string, direction: string) => `JSON array sorted by "${property}" (${direction}) and formatted compact successfully!`,
+		SORT_LIST_DOCUMENT: (property: string, direction: string) => `JSON array sorted by "${property}" (${direction}) and formatted compact successfully!`,
 		VALIDATE_SUCCESS: 'JSON is valid! ✅',
 		VALIDATE_SUCCESS_DETAILS: (lines: number, chars: number) => `JSON is valid! ✅ (${lines} lines, ${chars} characters)`
 	},
 	ERROR: {
 		NO_EDITOR: 'No active editor found',
 		INVALID_JSON: (error: string) => `Invalid JSON: ${error}`,
-		VALIDATION_FAILED: (error: string) => `JSON Validation Failed: ${error}`
+		VALIDATION_FAILED: (error: string) => `JSON Validation Failed: ${error}`,
+		NOT_ARRAY: 'Selected JSON is not an array. Sort operation requires an array.',
+		SORT_PROPERTY_NOT_FOUND: (property: string) => `Property "${property}" not found in array items.`,
+		SORT_CANCELLED: 'Sort operation was cancelled.'
 	}
 } as const;
 
@@ -247,6 +253,156 @@ export function activate(context: vscode.ExtensionContext) {
 		return JSON.stringify(obj);
 	}
 
+	// Helper function to sort JSON array by property or by value
+	function sortJsonArrayByProperty(arr: JsonArray, sortProperty?: string, ascending: boolean = true): JsonArray {
+		if (!Array.isArray(arr) || arr.length === 0) {
+			return arr;
+		}
+
+		// Check array composition
+		const firstItem = arr[0];
+		const hasPrimitiveValues = arr.every(item => 
+			typeof item === 'string' || 
+			typeof item === 'number' || 
+			typeof item === 'boolean' || 
+			item === null
+		);
+
+		const hasObjectValues = arr.some(item => 
+			typeof item === 'object' && 
+			item !== null && 
+			!Array.isArray(item)
+		);
+
+		// Handle pure primitive arrays
+		if (hasPrimitiveValues && !hasObjectValues) {
+			// Sort by the values themselves
+			return [...arr].sort((a, b) => {
+				// Handle null values
+				if (a === null && b === null) {
+					return 0;
+				}
+				if (a === null) {
+					return 1;  // null values go to end
+				}
+				if (b === null) {
+					return -1;
+				}
+
+				// Type-specific comparisons for primitives
+				if (typeof a === typeof b) {
+					if (typeof a === 'string') {
+						return a.localeCompare(b as string);
+					}
+					if (typeof a === 'number') {
+						return a - (b as number);
+					}
+					if (typeof a === 'boolean') {
+						return a === b ? 0 : (a ? 1 : -1);
+					}
+				}
+
+				// Different types - convert to string for comparison
+				return String(a).localeCompare(String(b));
+			});
+		}
+
+		// Handle mixed arrays or pure object arrays
+		let propertyToSort = sortProperty;
+
+		// For mixed arrays or when no property specified for object arrays
+		if (!propertyToSort && hasObjectValues) {
+			// Use the first property of the first object if no property specified
+			const firstObject = arr.find(item => 
+				typeof item === 'object' && 
+				item !== null && 
+				!Array.isArray(item)
+			);
+			
+			if (firstObject) {
+				const keys = Object.keys(firstObject);
+				if (keys.length > 0) {
+					propertyToSort = keys[0];
+				}
+			}
+		}
+
+		// Sort the array with mixed type support
+		return [...arr].sort((a, b) => {
+			let result = 0;
+
+			// Handle cases where one or both items are primitives
+			const aIsPrimitive = typeof a !== 'object' || a === null || Array.isArray(a);
+			const bIsPrimitive = typeof b !== 'object' || b === null || Array.isArray(b);
+
+			// If both are primitives, sort by value
+			if (aIsPrimitive && bIsPrimitive) {
+				if (a === null && b === null) {
+					result = 0;
+				} else if (a === null) {
+					result = 1;
+				} else if (b === null) {
+					result = -1;
+				} else if (typeof a === typeof b) {
+					if (typeof a === 'string') {
+						result = a.localeCompare(b as string);
+					} else if (typeof a === 'number') {
+						result = a - (b as number);
+					} else if (typeof a === 'boolean') {
+						result = a === b ? 0 : (a ? 1 : -1);
+					}
+				} else {
+					result = String(a).localeCompare(String(b));
+				}
+			}
+
+			// If one is primitive and one is object, primitives come first
+			else if (aIsPrimitive && !bIsPrimitive) {
+				result = -1;
+			} else if (!aIsPrimitive && bIsPrimitive) {
+				result = 1;
+			}
+			// Both are objects - sort by property if available
+			else if (propertyToSort && 
+				typeof a === 'object' && a !== null && !Array.isArray(a) &&
+				typeof b === 'object' && b !== null && !Array.isArray(b) &&
+				propertyToSort in a && propertyToSort in b) {
+				
+				const aValue = (a as Record<string, any>)[propertyToSort];
+				const bValue = (b as Record<string, any>)[propertyToSort];
+
+				// Handle different data types
+				if (aValue === bValue) {
+					result = 0;
+				} else if (aValue === null || aValue === undefined) {
+					result = 1;  // null/undefined values go to end
+				} else if (bValue === null || bValue === undefined) {
+					result = -1;
+				}
+
+				// Convert to strings for comparison if different types
+				else if (typeof aValue !== typeof bValue) {
+					result = String(aValue).localeCompare(String(bValue));
+				}
+				// Type-specific comparisons
+				else if (typeof aValue === 'string' && typeof bValue === 'string') {
+					result = aValue.localeCompare(bValue);
+				} else if (typeof aValue === 'number' && typeof bValue === 'number') {
+					result = aValue - bValue;
+				} else {
+					// Fallback to string comparison
+					result = String(aValue).localeCompare(String(bValue));
+				}
+			} else {
+				// If objects don't have the property, keep original order
+				result = 0;
+			}
+
+			// Apply ascending/descending direction
+			return ascending ? result : -result;
+		});
+	}
+
 	// Register the JSON format command
 	const formatJsonDisposable = vscode.commands.registerCommand(COMMANDS.FORMAT, async () => {
 		const editor = vscode.window.activeTextEditor;
@@ -349,6 +505,154 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(formatJsonListDisposable);
+
+	// Register the JSON sort list command
+	const sortJsonListDisposable = vscode.commands.registerCommand(COMMANDS.SORT_LIST, async () => {
+		const editor = vscode.window.activeTextEditor;
+		
+		if (!editor) {
+			vscode.window.showErrorMessage(MESSAGES.ERROR.NO_EDITOR);
+			return;
+		}
+
+		try {
+			const { text, range, isSelection } = prepareFormatting(editor);
+			const parsedJson: JsonValue = JSON.parse(text);
+
+			// Check if the JSON is an array
+			if (!Array.isArray(parsedJson)) {
+				vscode.window.showErrorMessage(MESSAGES.ERROR.NOT_ARRAY);
+				return;
+			}
+
+			if (parsedJson.length === 0) {
+				vscode.window.showInformationMessage('Array is empty, nothing to sort.');
+				return;
+			}
+
+			// Check if the array contains primitive values
+			const hasPrimitiveValues = parsedJson.every(item => 
+				typeof item === 'string' || 
+				typeof item === 'number' || 
+				typeof item === 'boolean' || 
+				item === null
+			);
+
+			// Check if we're dealing with primitive values or objects
+			const firstItem = parsedJson[0];
+			let availableProperties: string[] = [];
+
+			if (!hasPrimitiveValues && typeof firstItem === 'object' && firstItem !== null && !Array.isArray(firstItem)) {
+				availableProperties = Object.keys(firstItem);
+			}
+
+			let sortProperty: string | undefined;
+
+			if (hasPrimitiveValues) {
+				// Skip property selection for primitive arrays - sort by value
+				sortProperty = undefined;
+			} else if (availableProperties.length > 0) {
+				// Show quick pick for property selection
+				const propertyOptions = [
+					{
+						label: `$(arrow-right) ${availableProperties[0]}`,
+						description: 'Default - First property',
+						detail: `Sort by "${availableProperties[0]}" (default)`,
+						property: availableProperties[0]
+					},
+					...availableProperties.slice(1).map(prop => ({
+						label: `$(symbol-property) ${prop}`,
+						description: 'Property',
+						detail: `Sort by "${prop}"`,
+						property: prop
+					}))
+				];
+
+				const selected = await vscode.window.showQuickPick(propertyOptions, {
+					placeHolder: 'Select property to sort by (or press Escape to cancel)',
+					title: 'Sort JSON Array'
+				});
+
+				if (!selected) {
+					vscode.window.showInformationMessage(MESSAGES.ERROR.SORT_CANCELLED);
+					return;
+				}
+
+				sortProperty = selected.property;
+			} else {
+				// No available properties, use default
+				sortProperty = undefined;
+			}
+
+			// Show direction selection
+			const directionOptions = [
+				{
+					label: '$(arrow-up) Ascending',
+					description: 'A → Z, 0 → 9',
+					detail: 'Sort in ascending order (default)',
+					ascending: true
+				},
+				{
+					label: '$(arrow-down) Descending', 
+					description: 'Z → A, 9 → 0',
+					detail: 'Sort in descending order',
+					ascending: false
+				}
+			];
+
+			const directionSelected = await vscode.window.showQuickPick(directionOptions, {
+				placeHolder: 'Select sort direction (or press Escape to cancel)',
+				title: 'Sort Direction'
+			});
+
+			if (!directionSelected) {
+				vscode.window.showInformationMessage(MESSAGES.ERROR.SORT_CANCELLED);
+				return;
+			}
+
+			const ascending = directionSelected.ascending;
+
+			// Execute sorting with progress indicator for large files
+			const sortedJson = await executeWithProgress(
+				() => {
+					const sortedArray = sortJsonArrayByProperty(parsedJson, sortProperty, ascending);
+					const config = getFormatConfig();
+					return customJsonListFormat(sortedArray, 0, config.indentSpaces);
+				},
+				'Sorting and formatting JSON array...',
+				text
+			);
+
+			// Apply the sorted result
+			const edit = new vscode.WorkspaceEdit();
+			edit.replace(editor.document.uri, range, sortedJson);
+			await vscode.workspace.applyEdit(edit);
+			
+			// Determine what we sorted by for the success message
+			let sortDescription: string;
+			if (hasPrimitiveValues) {
+				sortDescription = 'value';
+			} else {
+				sortDescription = sortProperty || 'first available property';
+			}
+			
+			const direction = ascending ? 'ascending' : 'descending';
+			const message = isSelection 
+				? MESSAGES.SUCCESS.SORT_LIST_SELECTION(sortDescription, direction)
+				: MESSAGES.SUCCESS.SORT_LIST_DOCUMENT(sortDescription, direction);
+			vscode.window.showInformationMessage(message);
+
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			if (errorMessage.includes('Property') && errorMessage.includes('not found')) {
+				vscode.window.showErrorMessage(MESSAGES.ERROR.SORT_PROPERTY_NOT_FOUND(errorMessage.split('"')[1] || 'unknown'));
+			} else {
+				vscode.window.showErrorMessage(MESSAGES.ERROR.INVALID_JSON(errorMessage));
+			}
+		}
+	});
+
+	context.subscriptions.push(sortJsonListDisposable);
 
 	// Register the JSON validation command
 	const validateJsonDisposable = vscode.commands.registerCommand(COMMANDS.VALIDATE, async () => {

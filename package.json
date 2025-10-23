@@ -4,26 +4,14 @@
   "description": "Smart JSON formatter that keeps small objects compact while beautifully formatting larger structures with configurable indentation",
   "version": "1.0.0",
   "publisher": "ecleroux",
-  "author": {
-    "name": "Edwin le Roux"
-  },
+  "author": { "name": "Edwin le Roux" },
   "license": "MIT",
   "homepage": "https://github.com/ecleroux/genet-json-formatter#readme",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ecleroux/genet-json-formatter.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ecleroux/genet-json-formatter/issues"
-  },
-    "icon": "icon.png",
-  "engines": {
-    "vscode": "^1.105.0"
-  },
-  "categories": [
-    "Formatters",
-    "Other"
-  ],
+  "repository": { "type": "git", "url": "https://github.com/ecleroux/genet-json-formatter.git" },
+  "bugs": { "url": "https://github.com/ecleroux/genet-json-formatter/issues" },
+  "icon": "icon.png",
+  "engines": { "vscode": "^1.105.0" },
+  "categories": ["Formatters","Other"],
   "keywords": [
     "json",
     "formatter",
@@ -42,30 +30,17 @@
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
-      {
-        "id": "json",
-        "aliases": ["JSON", "json"],
-        "extensions": [".json"],
-        "mimetypes": ["application/json"]
-      }
+      { "id": "json", "aliases": ["JSON", "json"], "extensions": [".json"], "mimetypes": ["application/json"] }
     ],
     "commands": [
-      {
-        "command": "genet-json-formatter.formatJson",
-        "title": "Genet: JSON Format"
-      },
-      {
-        "command": "genet-json-formatter.minifyJson",
-        "title": "Genet: JSON Minify"
-      },
-      {
-        "command": "genet-json-formatter.validateJson",
-        "title": "Genet: JSON Validate"
-      },
+      { "command": "genet-json-formatter.formatJson", "title": "Genet: JSON Format" },
+      { "command": "genet-json-formatter.minifyJson", "title": "Genet: JSON Minify" },
+      { "command": "genet-json-formatter.validateJson", "title": "Genet: JSON Validate" },
       {
         "command": "genet-json-formatter.formatJsonListCompact",
         "title": "Genet: JSON Format List Compact"
-      }
+      },
+      { "command": "genet-json-formatter.sortJsonList", "title": "Genet: JSON Sort List" }
     ],
     "keybindings": [
       {
@@ -91,6 +66,12 @@
         "key": "ctrl+alt+l",
         "mac": "ctrl+cmd+alt+l",
         "when": "editorTextFocus && resourceExtname == .json"
+      },
+      {
+        "command": "genet-json-formatter.sortJsonList",
+        "key": "ctrl+alt+s",
+        "mac": "ctrl+cmd+alt+s",
+        "when": "editorTextFocus && resourceExtname == .json"
       }
     ],
     "configuration": {
@@ -110,11 +91,7 @@
           "maximum": 8,
           "description": "Number of spaces to use for indentation"
         },
-        "genet-json-formatter.formatOnSave": {
-          "type": "boolean",
-          "default": false,
-          "description": "Automatically format JSON files when saving"
-        }
+        "genet-json-formatter.formatOnSave": { "type": "boolean", "default": false, "description": "Automatically format JSON files when saving" }
       }
     }
   },

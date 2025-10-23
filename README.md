@@ -69,6 +69,7 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
 ### Method 4: Keyboard Shortcuts (Fastest)
 - **Format JSON**: `Ctrl+Alt+F` (Windows/Linux) or `Ctrl+Cmd+Option+F` (macOS)
 - **Format List**: `Ctrl+Alt+L` (Windows/Linux) or `Ctrl+Cmd+Option+L` (macOS)
+- **Sort List**: `Ctrl+Alt+S` (Windows/Linux) or `Ctrl+Cmd+Option+S` (macOS)
 - **Minify JSON**: `Ctrl+Alt+M` (Windows/Linux) or `Ctrl+Cmd+Option+M` (macOS)
 - **Validate JSON**: `Ctrl+Alt+V` (Windows/Linux) or `Ctrl+Cmd+Option+V` (macOS)
 - **Works only in JSON files** for context-aware operation
@@ -84,7 +85,27 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
 - **Save any JSON file** (`Cmd+S` / `Ctrl+S`)
 - **Automatic formatting** applied using your configured settings
 
-## 📋 Examples
+## 🎬 Feature Demos
+
+### Smart JSON Formatting (`Ctrl+Alt+F`)
+Transform messy JSON into beautifully formatted, readable code with intelligent line-length optimization.
+
+<!-- ![JSON Formatting Demo](./assets/demo-formatting.gif) -->
+**✨ Press `Ctrl+Alt+F` to instantly format any JSON - complex nested structures become perfectly readable with smart single-line optimization**
+
+### Compact List Formatting (`Ctrl+Alt+L`)  
+Perfect for data arrays where you want each item on its own line for easy scanning.
+
+<!-- ![List Formatting Demo](./assets/demo-list-formatting.gif) -->
+**📋 Press `Ctrl+Alt+L` to format arrays with each item on a single line - ideal for API responses, configuration lists, and data tables**
+
+### Interactive Array Sorting (`Ctrl+Alt+S`)
+Sort JSON arrays by any property with an intuitive property picker, plus automatic formatting.
+
+<!-- ![Array Sorting Demo](./assets/demo-sorting.gif) -->
+**🔄 Press `Ctrl+Alt+S` to sort arrays interactively - choose any property from a visual picker, with smart support for mixed-type arrays**
+
+## 📋 Code Examples
 
 ### Smart Formatting (Genet: JSON Format)
 
@@ -166,6 +187,81 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
 }
 ```
 **Result:** ❌ `JSON Validation Failed: Unexpected string in JSON at position 65 (Line 4, Column 26)`
+
+### JSON Array Sorting (Genet: JSON Sort List)
+
+**Interactive property selection with smart defaults**
+
+**Before:**
+```json
+[
+  { "id": 3, "name": "Carol Davis", "age": 42, "city": "Chicago" },
+  { "id": 1, "name": "Alice Johnson", "age": 28, "city": "San Francisco" },
+  { "id": 2, "name": "Bob Smith", "age": 35, "city": "New York" }
+]
+```
+
+**After sorting by "name" ascending (automatically applies compact list formatting):**
+```json
+[
+  { "id": 1, "name": "Alice Johnson", "age": 28, "city": "San Francisco" },
+  { "id": 2, "name": "Bob Smith", "age": 35, "city": "New York" },
+  { "id": 3, "name": "Carol Davis", "age": 42, "city": "Chicago" }
+]
+```
+
+**Sort direction example (by "age" descending):**
+```json
+[
+  { "id": 3, "name": "Carol Davis", "age": 42, "city": "Chicago" },
+  { "id": 2, "name": "Bob Smith", "age": 35, "city": "New York" },
+  { "id": 1, "name": "Alice Johnson", "age": 28, "city": "San Francisco" }
+]
+```
+
+**Mixed-type arrays example:**
+```json
+// Before: mixed objects and primitives
+[
+  { "name": "Alice", "age": 30 },
+  "simple string",
+  42,
+  { "name": "Bob", "age": 25 },
+  true,
+  null
+]
+
+// After sorting (primitives first by value, then objects by property):
+[
+  null,
+  true,
+  42,
+  "simple string",
+  { "name": "Alice", "age": 30 },
+  { "name": "Bob", "age": 25 }
+]
+```
+
+**Features:**
+- **Interactive property picker** - Choose from available object properties  
+- **Sort direction selection** - Choose ascending (A→Z, 0→9) or descending (Z→A, 9→0) order
+- **Smart defaults** - Uses first property if none selected
+- **Primitive value sorting** - Sorts arrays of strings, numbers, booleans by value
+- **Mixed-type arrays** - Handles arrays with both objects and primitives (primitives first, then objects by property)
+- **Type-aware sorting** - Numbers, strings, mixed types handled correctly
+- **Null-safe** - Handles null/undefined values gracefully
+- **Auto-formatting** - Applies compact list formatting after sorting
+
+**Primitive value sorting example:**
+```json
+// Before: ["zebra", "apple", "banana", "cherry"]
+// Ascending:  ["apple", "banana", "cherry", "zebra"]
+// Descending: ["zebra", "cherry", "banana", "apple"]
+
+// Before: [42, 7, 23, 1, 89, 15]  
+// Ascending:  [1, 7, 15, 23, 42, 89]
+// Descending: [89, 42, 23, 15, 7, 1]
+```
 
 ### Selection-Based Formatting
 
@@ -278,6 +374,7 @@ To make Genet your default JSON formatter:
 |---------|-------------|-------------------|--------|
 | `Genet: JSON Format` | Smart formatting with intelligent compact/expanded layout | `Ctrl+Alt+F` / `Ctrl+Cmd+Option+F` | Command Palette, Format Document, or shortcut |
 | `Genet: JSON Format List Compact` | Format arrays with each item on new line as compact single-line objects | `Ctrl+Alt+L` / `Ctrl+Cmd+Option+L` | Command Palette or shortcut |
+| `Genet: JSON Sort List` | Sort JSON arrays by any property and format compact with interactive property selection | `Ctrl+Alt+S` / `Ctrl+Cmd+Option+S` | Command Palette or shortcut |
 | `Genet: JSON Minify` | Ultra-compact single-line JSON output | `Ctrl+Alt+M` / `Ctrl+Cmd+Option+M` | Command Palette or shortcut |
 | `Genet: JSON Validate` | Validate JSON syntax with detailed error reporting | `Ctrl+Alt+V` / `Ctrl+Cmd+Option+V` | Command Palette or shortcut |
 | **Format Document** | VS Code's built-in formatter (uses Genet when set as default) | `Shift+Alt+F` / `Shift+Option+F` | Built-in VS Code shortcut, right-click menu |
@@ -285,7 +382,7 @@ To make Genet your default JSON formatter:
 
 ### VS Code Integration Notes
 - **Format Document** and **Format Selection** appear in VS Code's right-click context menu when available
-- **Custom commands** (`Genet: JSON Format`, `Format List Compact`, `Minify`, `Validate`) are accessed via Command Palette or keyboard shortcuts
+- **Custom commands** (`Genet: JSON Format`, `Format List Compact`, `Sort List`, `Minify`, `Validate`) are accessed via Command Palette or keyboard shortcuts
 - **No custom context menu items** - integration works through VS Code's built-in formatting system
 
 ## 🔌 VS Code Integration
@@ -311,6 +408,7 @@ To make Genet your default JSON formatter:
 |--------|---------------|-------|
 | **Format JSON** | `Ctrl+Alt+F` | `Ctrl+Cmd+Option+F` |
 | **Format List** | `Ctrl+Alt+L` | `Ctrl+Cmd+Option+L` |
+| **Sort List** | `Ctrl+Alt+S` | `Ctrl+Cmd+Option+S` |
 | **Minify JSON** | `Ctrl+Alt+M` | `Ctrl+Cmd+Option+M` |
 | **Validate JSON** | `Ctrl+Alt+V` | `Ctrl+Cmd+Option+V` |
 
@@ -328,6 +426,14 @@ To make Genet your default JSON formatter:
 - **Progress indicators** for large file operations (>50KB)
 - **Robust error recovery** that doesn't break VS Code
 - **Optimized** for real-time formatting operations
+
+### Testing & Quality Assurance
+- **118 comprehensive unit tests** covering all functionality
+- **Sorting algorithm tests** for all array types (objects, primitives, mixed)
+- **Edge case testing** (empty arrays, null values, malformed JSON)
+- **Performance testing** for large datasets and deep nesting
+- **Integration testing** with VS Code APIs and commands
+- **Cross-platform validation** ensuring consistent behavior
 
 ## 📝 Release Notes
 

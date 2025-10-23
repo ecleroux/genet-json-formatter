@@ -11,17 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **JSON List Compact Formatting**: New `Genet: JSON Format List Compact` command that formats arrays with each item on a new line as compact single-line objects for optimal scan-ability
 - **List Format Keyboard Shortcut**: `Ctrl+Alt+L` (Windows/Linux) or `Ctrl+Cmd+Option+L` (macOS)
 - **Dedicated List Formatter**: New `customJsonListFormat()` function optimized for data lists, API responses, and configuration arrays
+- **JSON Array Sorting**: New `Genet: JSON Sort List` command with interactive property selection, ascending/descending direction choice, primitive value sorting, mixed-type array support, smart defaults, and automatic compact list formatting
+- **Sort Keyboard Shortcut**: `Ctrl+Alt+S` (Windows/Linux) or `Ctrl+Cmd+Option+S` (macOS)
 - **Future-Proof Command ID**: Uses `genet-json-formatter.formatJsonListCompact` for consistency and future extensibility
 
 ### Enhanced
-- **Command Palette**: Added "Genet: JSON Format List Compact" to available commands
-- **Documentation**: Updated README.md with list formatting examples and usage instructions
-- **Keyboard Shortcuts**: Extended shortcuts table to include the new list formatting option
+- **Sort Direction Control**: Interactive ascending/descending direction selection for all array sorting (objects and primitives)
+- **Mixed-Type Array Sorting**: Arrays containing both objects and primitives now sort intelligently (primitives first by value, then objects by selected property)
+- **Command Palette**: Added "Genet: JSON Format List Compact" and "Genet: JSON Sort List" to available commands
+- **Documentation**: Updated README.md with list formatting examples, mixed-type sorting, and direction control usage instructions
+- **Keyboard Shortcuts**: Extended shortcuts table to include list formatting and sorting options
 
 ### Technical
 - **Type Safety**: Maintained full TypeScript implementation with proper error handling
-- **Performance**: List formatting includes progress indicators for large files (>50KB)
+- **Performance**: List formatting and sorting include progress indicators for large files (>50KB)
+- **Smart Sorting**: Type-aware sorting algorithm handles objects by property, primitive values by value, strings, numbers, mixed types, and null values
+- **Interactive UI**: Quick pick interface for property selection with visual icons and descriptions
 - **Integration**: Seamless integration with existing VS Code formatting workflows
+- **Unit Tests**: Added comprehensive test suite with 118+ tests covering all sorting scenarios, edge cases, and performance validation
 
 ## [1.0.0] - 2025-10-17
 

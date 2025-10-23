@@ -1,9 +1,0 @@
-// Test output for the updated list formatting
-// Input: [{"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "profile": {"age": 28, "location": "San Francisco", "interests": ["technology", "travel", "photography"]}}, {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "profile": {"age": 35, "location": "New York", "interests": ["sports", "music", "cooking"]}}, {"id": 3, "name": "Carol Davis", "email": "carol@example.com", "profile": {"age": 42, "location": "Chicago", "interests": ["reading", "gardening", "yoga"]}}]
-
-// Expected Output with List Format:
-[
-  { "id": 1, "name": "Alice Johnson", "email": "alice@example.com", "profile": { "age": 28, "location": "San Francisco", "interests": ["technology", "travel", "photography"] } },
-  { "id": 2, "name": "Bob Smith", "email": "bob@example.com", "profile": { "age": 35, "location": "New York", "interests": ["sports", "music", "cooking"] } },
-  { "id": 3, "name": "Carol Davis", "email": "carol@example.com", "profile": { "age": 42, "location": "Chicago", "interests": ["reading", "gardening", "yoga"] } }
-]
