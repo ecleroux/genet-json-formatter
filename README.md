@@ -2,7 +2,49 @@
 
 **Complete JSON toolkit with intelligent formatting**
 
-Genet JSON Formatter provides a comprehensive suite of JSON tools with intelligent, adaptive formatting. Keep small objects compact for readability while properly formatting complex structures, plus minification and selection-based formatting.
+Genet JSON Formatter provides a comprehensive suite of JSON tools with intelligent, adaptive formatting. Keep small objects compact for readability while properly formatting complex structures, plus minification, selection-based formatting, compact list formatting, interactive list sorting, and comprehensive JSON validation.
+
+## 🎬 Feature Demos
+
+### Smart JSON Formatting (`Ctrl+Alt+F`)
+Transform messy JSON into beautifully formatted, readable code with intelligent line-length optimization.
+
+![JSON Formatting Demo](./assets/demo-formatting.gif)
+
+*Formats complex nested JSON with perfect indentation and smart single-line optimization*
+
+---
+
+### Compact List Formatting (`Ctrl+Alt+L`)  
+Perfect for data arrays where you want each item on its own line for easy scanning.
+
+![List Formatting Demo](./assets/demo-list-formatting.gif)
+
+*Each array item becomes a compact single line - ideal for API responses and data lists*
+
+**Key differences from regular format:**
+- **Each array item gets its own line** but stays compact on that line
+- **Objects remain single-line** with proper spacing for readability
+- **Perfect for data lists, logs, and tabular JSON data**
+
+---
+
+### Interactive Array Sorting (`Ctrl+Alt+S`)
+Sort JSON arrays by any property with an intuitive property picker, plus automatic formatting.
+
+![Array Sorting Demo](./assets/demo-sorting.gif)
+
+*Choose any property to sort by, with smart defaults and mixed-type support*
+
+**Features:**
+- **Interactive property picker** - Choose from available object properties  
+- **Sort direction selection** - Choose ascending (A→Z, 0→9) or descending (Z→A, 9→0) order
+- **Smart defaults** - Uses first property if none selected
+- **Primitive value sorting** - Sorts arrays of strings, numbers, booleans by value
+- **Mixed-type arrays** - Handles arrays with both objects and primitives (primitives first, then objects by property)
+- **Type-aware sorting** - Numbers, strings, mixed types handled correctly
+- **Null-safe** - Handles null/undefined values gracefully
+- **Auto-formatting** - Applies compact list formatting after sorting
 
 ## ✨ Features
 
@@ -84,206 +126,6 @@ Genet JSON Formatter provides a comprehensive suite of JSON tools with intellige
 - **Enable** format-on-save in extension settings
 - **Save any JSON file** (`Cmd+S` / `Ctrl+S`)
 - **Automatic formatting** applied using your configured settings
-
-## 🎬 Feature Demos
-
-### Smart JSON Formatting (`Ctrl+Alt+F`)
-Transform messy JSON into beautifully formatted, readable code with intelligent line-length optimization.
-
-<!-- ![JSON Formatting Demo](./assets/demo-formatting.gif) -->
-**✨ Press `Ctrl+Alt+F` to instantly format any JSON - complex nested structures become perfectly readable with smart single-line optimization**
-
-### Compact List Formatting (`Ctrl+Alt+L`)  
-Perfect for data arrays where you want each item on its own line for easy scanning.
-
-<!-- ![List Formatting Demo](./assets/demo-list-formatting.gif) -->
-**📋 Press `Ctrl+Alt+L` to format arrays with each item on a single line - ideal for API responses, configuration lists, and data tables**
-
-### Interactive Array Sorting (`Ctrl+Alt+S`)
-Sort JSON arrays by any property with an intuitive property picker, plus automatic formatting.
-
-<!-- ![Array Sorting Demo](./assets/demo-sorting.gif) -->
-**🔄 Press `Ctrl+Alt+S` to sort arrays interactively - choose any property from a visual picker, with smart support for mixed-type arrays**
-
-## 📋 Code Examples
-
-### Smart Formatting (Genet: JSON Format)
-
-**Before:**
-```json
-{"name":"John Doe","age":30,"address":{"street":"123 Main St","city":"New York","country":"USA"},"hobbies":["reading","coding"],"contacts":[{"type":"email","value":"john@example.com"},{"type":"phone","value":"555-1234"}]}
-```
-
-**After:**
-```json
-{
-  "name": "John Doe",
-  "age": 30,
-  "address": { "street": "123 Main St", "city": "New York", "country": "USA" },
-  "hobbies": ["reading", "coding"],
-  "contacts": [
-    { "type": "email", "value": "john@example.com" },
-    { "type": "phone", "value": "555-1234" }
-  ]
-}
-```
-
-### JSON List Compact Formatting (Genet: JSON Format List Compact)
-
-**Perfect for arrays where each item should be on its own line, regardless of size**
-
-**Before:**
-```json
-[{"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "profile": {"age": 28, "location": "San Francisco"}}, {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "profile": {"age": 35, "location": "New York"}}]
-```
-
-**After (List Format):**
-```json
-[
-  { "id": 1, "name": "Alice Johnson", "email": "alice@example.com", "profile": { "age": 28, "location": "San Francisco" } },
-  { "id": 2, "name": "Bob Smith", "email": "bob@example.com", "profile": { "age": 35, "location": "New York" } }
-]
-```
-
-**Key differences from regular format:**
-- **Each array item gets its own line** but stays compact on that line
-- **Objects remain single-line** with proper spacing for readability
-- **Perfect for data lists, logs, and tabular JSON data**
-
-### JSON Minification (Genet: JSON Minify)
-
-**Before (formatted):**
-```json
-{
-  "name": "John Doe",
-  "age": 30,
-  "city": "New York"
-}
-```
-
-**After (minified):**
-```json
-{"name":"John Doe","age":30,"city":"New York"}
-```
-
-### JSON Validation (Genet: JSON Validate)
-
-**Valid JSON:**
-```json
-{
-  "name": "John Doe",
-  "age": 30,
-  "skills": ["JavaScript", "Python"]
-}
-```
-**Result:** ✅ `JSON document is valid! 5 lines, 87 characters (1 objects, 1 arrays)`
-
-**Invalid JSON:**
-```json
-{
-  "name": "John Doe",
-  "age": 30,
-  "skills": ["JavaScript" "Python"]  ← Missing comma
-}
-```
-**Result:** ❌ `JSON Validation Failed: Unexpected string in JSON at position 65 (Line 4, Column 26)`
-
-### JSON Array Sorting (Genet: JSON Sort List)
-
-**Interactive property selection with smart defaults**
-
-**Before:**
-```json
-[
-  { "id": 3, "name": "Carol Davis", "age": 42, "city": "Chicago" },
-  { "id": 1, "name": "Alice Johnson", "age": 28, "city": "San Francisco" },
-  { "id": 2, "name": "Bob Smith", "age": 35, "city": "New York" }
-]
-```
-
-**After sorting by "name" ascending (automatically applies compact list formatting):**
-```json
-[
-  { "id": 1, "name": "Alice Johnson", "age": 28, "city": "San Francisco" },
-  { "id": 2, "name": "Bob Smith", "age": 35, "city": "New York" },
-  { "id": 3, "name": "Carol Davis", "age": 42, "city": "Chicago" }
-]
-```
-
-**Sort direction example (by "age" descending):**
-```json
-[
-  { "id": 3, "name": "Carol Davis", "age": 42, "city": "Chicago" },
-  { "id": 2, "name": "Bob Smith", "age": 35, "city": "New York" },
-  { "id": 1, "name": "Alice Johnson", "age": 28, "city": "San Francisco" }
-]
-```
-
-**Mixed-type arrays example:**
-```json
-// Before: mixed objects and primitives
-[
-  { "name": "Alice", "age": 30 },
-  "simple string",
-  42,
-  { "name": "Bob", "age": 25 },
-  true,
-  null
-]
-
-// After sorting (primitives first by value, then objects by property):
-[
-  null,
-  true,
-  42,
-  "simple string",
-  { "name": "Alice", "age": 30 },
-  { "name": "Bob", "age": 25 }
-]
-```
-
-**Features:**
-- **Interactive property picker** - Choose from available object properties  
-- **Sort direction selection** - Choose ascending (A→Z, 0→9) or descending (Z→A, 9→0) order
-- **Smart defaults** - Uses first property if none selected
-- **Primitive value sorting** - Sorts arrays of strings, numbers, booleans by value
-- **Mixed-type arrays** - Handles arrays with both objects and primitives (primitives first, then objects by property)
-- **Type-aware sorting** - Numbers, strings, mixed types handled correctly
-- **Null-safe** - Handles null/undefined values gracefully
-- **Auto-formatting** - Applies compact list formatting after sorting
-
-**Primitive value sorting example:**
-```json
-// Before: ["zebra", "apple", "banana", "cherry"]
-// Ascending:  ["apple", "banana", "cherry", "zebra"]
-// Descending: ["zebra", "cherry", "banana", "apple"]
-
-// Before: [42, 7, 23, 1, 89, 15]  
-// Ascending:  [1, 7, 15, 23, 42, 89]
-// Descending: [89, 42, 23, 15, 7, 1]
-```
-
-### Selection-Based Formatting
-
-**Select part of a large JSON:**
-```json
-{
-  "users": [
-    {"name":"John","age":30,"city":"NYC"},  ← Select this object
-    {"name":"Jane","age":25,"city":"LA"}
-  ]
-}
-```
-
-**Format only the selection:**
-```json
-{
-  "users": [
-    { "name": "John", "age": 30, "city": "NYC" },  ← Only this was formatted
-    {"name":"Jane","age":25,"city":"LA"}
-  ]
-}
-```
 
 ## ⚙️ Extension Settings
 
@@ -437,6 +279,17 @@ To make Genet your default JSON formatter:
 
 ## 📝 Release Notes
 
+### 1.0.1 - 2025-10-22
+- **NEW: JSON List Compact Formatting** - `Genet: JSON Format List Compact` command formats arrays with each item on a single line for optimal data scanning
+- **NEW: Interactive Array Sorting** - `Genet: JSON Sort List` command with property selection, ascending/descending direction choice, and automatic compact formatting
+- **NEW: Mixed-Type Array Support** - Sort arrays containing both objects and primitives intelligently (primitives first by value, then objects by property)
+- **NEW: Sort Direction Control** - Choose ascending (A→Z, 0→9) or descending (Z→A, 9→0) for all sorting operations
+- **NEW: Enhanced Keyboard Shortcuts** - Added `Ctrl+Alt+L` for list formatting and `Ctrl+Alt+S` for array sorting
+- **ENHANCED: Smart Sorting Algorithm** - Type-aware sorting handles strings, numbers, booleans, null values, and mixed types with proper fallback comparisons
+- **ENHANCED: Interactive UI** - Visual property picker with icons and descriptions for intuitive sorting
+- **ENHANCED: Comprehensive Testing** - Added 118+ unit tests covering all sorting scenarios, edge cases, and performance validation
+- **TECHNICAL: Full TypeScript Safety** - Maintained strict type checking with enhanced error handling for new features
+
 ### 1.0.0
 - Initial release with comprehensive JSON toolkit
 - **Smart compact formatting** with intelligent layout decisions
@@ -452,14 +305,14 @@ To make Genet your default JSON formatter:
 - **Professional code structure** with proper TypeScript types
 - **Language association** for seamless VS Code integration
 - **Error-safe operations** that never interfere with file saving
-- **Comprehensive test suite** with 150+ automated tests covering functionality, performance, and edge cases
+- **Comprehensive test suite** with 118+ automated tests covering functionality, performance, sorting algorithms, and edge cases
 
 ## 🧪 **Testing & Quality Assurance**
 
 ### **Comprehensive Test Coverage**
 This extension includes a robust testing suite ensuring reliability and performance:
 
-- **🎯 Functional Tests**: 78 automated tests covering all features ✅
+- **🎯 Functional Tests**: 118+ automated tests covering all features including advanced sorting ✅
 - **⚡ Performance Tests**: Large file handling (1MB+ JSON) and stress testing ✅
 - **🔧 Integration Tests**: Complete VS Code API integration validation ✅
 - **🐛 Edge Case Tests**: Invalid JSON, malformed data, and error scenarios ✅

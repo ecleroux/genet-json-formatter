@@ -1,1 +1,27 @@
-{"name":"John Doe","age":30,"address":{"street":"123 Main St","city":"New York","zipCode":"10001","country":"USA"},"hobbies":["reading","coding","traveling"],"contacts":[{"type":"email","value":"john@example.com"},{"type":"phone","value":"555-1234"}],"active":true,"lastLogin":"2024-10-23T10:30:00Z"}
+{
+  "name": "John Doe",
+  "age": 30,
+  "address": {
+    "street": "123 Main St",
+    "city": "New York",
+    "zipCode": "10001",
+    "country": "USA"
+  },
+  "hobbies": [
+    "reading",
+    "coding",
+    "traveling"
+  ],
+  "contacts": [
+    {
+      "type": "email",
+      "value": "john@example.com"
+    },
+    {
+      "type": "phone",
+      "value": "555-1234"
+    }
+  ],
+  "active": true,
+  "lastLogin": "2024-10-23T10:30:00Z"
+}
